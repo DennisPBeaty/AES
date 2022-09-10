@@ -3,8 +3,13 @@
 //AES Project
 //September 9th, 2022
 
+using namespace std;
+
 #include <stdio.h>
 #include <stdint.h>
+#include <Sbox.h>
+#include <iostream>
+#include <vector>
 
 // adds two finite fields
 uint8_t ffadd(uint8_t field1, uint8_t field2)
@@ -59,9 +64,26 @@ uint8_t ffmultiply(uint8_t a, uint8_t b)
 // takes a four-byte input word and substitutes each byte in that word with its appropriate value from the S-Box
 uint32_t subWord(uint32_t word)
 {
+    vector<uint32_t> buffer;
 
+    //Add individual bytes to buffer
+    buffer.push_back((word & 0xFF000000) >> 24);
+    buffer.push_back((word & 0xFF0000) >> 16);
+    buffer.push_back((word & 0xFF00) >> 8);
+    buffer.push_back(word & 0xFF);
+
+    uint32_t result = 0x0;
+    //Perform substitution of each byte with its corresponding location in Sbox
+    for (int i = 0; i < buffer.size(); i++)
+    {
+        uint32_t j = (buffer[i] & 0xF0) >> 4;
+		uint32_t k = buffer[i] & 0xF;
+
+        result = (result << 8) + sBox[j][k];
+    }
+
+    return result;
 }
-
 // performs a cyclic permutation on its input word
 uint32_t rotWord(uint32_t word)
 {
