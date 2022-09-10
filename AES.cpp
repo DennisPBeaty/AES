@@ -87,7 +87,9 @@ uint32_t subWord(uint32_t word)
 // performs a cyclic permutation on its input word
 uint32_t rotWord(uint32_t word)
 {
-    
+    uint32_t result = (word << 8) & 0xFFFFFFFF;
+
+    return (result | ((word >> 24) & 0xFF));
 }
 
 // This transformation substitutes each byte in the State with its corresponding value from the S-Box.
