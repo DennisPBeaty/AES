@@ -77,5 +77,5 @@ void mixColumns(uint8_t **state)
 // This transformation adds a round key to the State using XOR.
 void addRoundKey(uint8_t **state)
 {
-
+    
 }
