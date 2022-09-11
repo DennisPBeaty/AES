@@ -16,8 +16,6 @@ using namespace std;
 #include <CipherFunction.h>
 #include <InvCipherFunction.h>
 
-
-
 int main (int argc, char *argv[]) 
 {
 

@@ -23,6 +23,7 @@ uint32_t subWord(uint32_t word)
 
     return result;
 }
+
 // performs a cyclic permutation on its input word
 uint32_t rotWord(uint32_t word)
 {

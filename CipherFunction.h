@@ -75,7 +75,30 @@ void mixColumns(uint8_t **state)
 }
 
 // This transformation adds a round key to the State using XOR.
-void addRoundKey(uint8_t **state)
+void addRoundKey(uint8_t **state, int round, uint32_t *w)
 {
-    
+    uint8_t **buffer, **key;
+
+    //Find the key
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            key[i][j] = (w[round*4+j] >> ((3-i)*8)) & 0xFF;
+        }
+    }
+
+    //Xor with key/Add
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            state[i][j] = ffadd(key[i][j], state[i][j]);
+        }
+    }
+}
+
+void cipher(string plain, string key, int Nk, int Nr)
+{
+
 }
