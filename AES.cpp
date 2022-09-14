@@ -15,6 +15,7 @@ using namespace std;
 #include <KeyExpansion.h>
 #include <CipherFunction.h>
 #include <InvCipherFunction.h>
+#include <Conversions.h>
 
 int main (int argc, char *argv[]) 
 {

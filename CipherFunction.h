@@ -100,5 +100,6 @@ void addRoundKey(uint8_t **state, int round, uint32_t *w)
 
 void cipher(string plain, string key, int Nk, int Nr)
 {
-    
+    uint8_t **state = stringTo2dArray(plain);
+    uint8_t **key_convert = stringTo2dArray(key);
 }
