@@ -100,5 +100,5 @@ void addRoundKey(uint8_t **state, int round, uint32_t *w)
 
 void cipher(string plain, string key, int Nk, int Nr)
 {
-
+    
 }

@@ -74,7 +74,7 @@ void invMixColumns(uint8_t **state)
     }
 }
 
-void cipher(string cipher, string key, int Nk, int Nr)
+void invCipher(string cipher, string key, int Nk, int Nr)
 {
 
 }
