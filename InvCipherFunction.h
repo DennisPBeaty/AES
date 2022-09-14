@@ -28,8 +28,6 @@ uint8_t ** invSubBytes(uint8_t **state)
 // This transformation performs the inverse of shiftRows() on each row in the State
 void invShiftRows(uint8_t **state)
 {
-    uint8_t **buffer;
-
     //Loop through every row within the state
     for (int i = 0; i < 4; i++)
     {
@@ -74,7 +72,35 @@ void invMixColumns(uint8_t **state)
     }
 }
 
-void invCipher(string cipher, string key, int Nk, int Nr)
+void invCipher(uint8_t ** cipher, string key, int Nk, int Nr)
 {
+    uint8_t **key_convert = stringTo2dArray(key);
+    uint32_t *w = KeyExpansion(key_convert, Nk, Nr);
 
-}
+    cout << "round[ 0].iinput      " << arrayToString(cipher) << endl;
+    cout << "round[ 0].ik_sch       " << arrayToString(retrieveKey(w, 0)) << endl;
+
+
+    addRoundKey(cipher,0,w);
+
+    for (int i = Nr-1; i > 0; i++)
+    {
+        cout << "round[" << setw(2) << Nr-i << "].istart       " << arrayToString(cipher) << endl;
+        invShiftRows(cipher);
+        cout << "round[" << setw(2) << Nr-i << "].is_row       " << arrayToString(cipher) << endl;
+        cipher = invSubBytes(cipher);
+        cout << "round[" << setw(2) << Nr-i << "].is_box       " << arrayToString(cipher) << endl;
+        addRoundKey(cipher, i, w);
+        cout << "round[" << setw(2) << Nr-i << "].ik_sch       " << arrayToString(retrieveKey(w, i)) << endl;
+        cout << "round[" << setw(2) << Nr-i << "].ik_add       " << arrayToString(cipher) << endl;
+        invMixColumns(cipher);
+    }
+    cout << "round[" << setw(2) << Nr << "].istart       " << arrayToString(cipher) << endl;
+    invShiftRows(cipher);
+    cout << "round[" << setw(2) << Nr << "].is_row       " << arrayToString(cipher) << endl;
+    cipher = invSubBytes(cipher);
+    cout << "round[" << setw(2) << Nr << "].is_box       " << arrayToString(cipher) << endl;
+    cout << "round[" << setw(2) << Nr << "].ik_sch       " << arrayToString(retrieveKey(w, Nr)) << endl;
+    addRoundKey(cipher, Nr, w);
+    cout << "round[" << setw(2) << Nr << "].ioutput      " << arrayToString(retrieveKey(w, Nr)) << endl;
+}   
