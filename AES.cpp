@@ -9,13 +9,13 @@ using namespace std;
 #include <stdint.h>
 #include <iostream>
 #include <vector>
-#include <Sbox.h>
-#include <Rcon.h>
-#include <ffFunctions.h>
-#include <KeyExpansion.h>
-#include <CipherFunction.h>
-#include <InvCipherFunction.h>
-#include <Conversions.h>
+#include "Rcon.h"
+#include "Sbox.h"
+#include "ffFunctions.h"
+#include "KeyExpansion.h"
+#include "CipherFunction.h"
+#include "InvCipherFunction.h"
+#include "Conversions.h"
 
 int main (int argc, char *argv[]) 
 {

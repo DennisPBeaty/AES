@@ -33,7 +33,7 @@ uint32_t rotWord(uint32_t word)
 }
 
 //Routine used to generate a series of Round Keys from the Cipher Key. 
-uint32_t * KeyExpansion(uint8_t **key, int Nk, int Nr)
+uint32_t * KeyExpansion(uint8_t *key, int Nk, int Nr)
 {
     uint32_t temp;
     uint32_t *w;
