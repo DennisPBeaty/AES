@@ -119,7 +119,7 @@ vector<vector<unsigned char>> cipher(string plain, string key, int Nk, int Nr)
 
     for (int i = 1; i < Nr; i++)
     {
-        cout << "round[" << setw(2) << i << "].k_sch      "; printState(state); cout << endl;
+        cout << "round[" << setw(2) << i << "].k_sch      "; printState(retrieveKey(w, i)); cout << endl;
         cout << "round[" << setw(2) << i << "].start      "; printState(state); cout <<  endl;
 
         state = subBytes(state);
@@ -138,7 +138,7 @@ vector<vector<unsigned char>> cipher(string plain, string key, int Nk, int Nr)
     shiftRows(state);
     cout << "round[" << setw(2) << Nr << "].s_row      "; printState(state); cout << endl;
     addRoundKey(state, w, 4);
-    cout << "round[" << setw(2) << Nr << "].k_sch      "; printState(state); cout << endl;
+    cout << "round[" << setw(2) << Nr << "].k_sch      "; printState(retrieveKey(w, Nr)); cout << endl;
     cout << "round[" << setw(2) << Nr << "].output     "; printState(state); cout << endl;
 
     return state;

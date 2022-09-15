@@ -95,7 +95,7 @@ void invCipher(vector<vector<unsigned char>> cipher, string key, int Nk, int Nr)
         cipher = invSubBytes(cipher);
         cout << "round[" << setw(2) << Nr-i << "].is_box     "; printState(cipher); cout << endl;
         addRoundKey(cipher, w, 4);
-        cout << "round[" << setw(2) << Nr-i << "].ik_sch     "; printState(cipher); cout << endl;
+        cout << "round[" << setw(2) << Nr-i << "].ik_sch     "; printState(retrieveKey(w, i)); cout << endl;
         cout << "round[" << setw(2) << Nr-i << "].ik_add     "; printState(cipher); cout << endl;
         invMixColumns(cipher);
     }
@@ -104,7 +104,7 @@ void invCipher(vector<vector<unsigned char>> cipher, string key, int Nk, int Nr)
     cout << "round[" << setw(2) << Nr << "].is_row     "; printState(cipher); cout << endl;
     cipher = invSubBytes(cipher);
     cout << "round[" << setw(2) << Nr << "].is_box     "; printState(cipher); cout << endl;
-    cout << "round[" << setw(2) << Nr << "].ik_sch     "; printState(cipher); cout << endl;
+    cout << "round[" << setw(2) << Nr << "].ik_sch     "; printState(retrieveKey(w, Nr)); cout << endl;
     addRoundKey(cipher, w, 4);
     cout << "round[" << setw(2) << Nr << "].ioutput    "; printState(cipher); cout << endl;
 }   
