@@ -1,10 +1,11 @@
 #include <stdint.h>
+#include "Conversions.h"
 
 // This transformation substitutes each byte in the State with its corresponding value from the inverse S-Box,
 // thus reversing the effect of a subBytes() operation.
-uint8_t ** invSubBytes(uint8_t **state)
+vector<vector<unsigned char>> invSubBytes(vector<vector<unsigned char>>state)
 {
-    uint8_t **buffer;
+    vector<vector<unsigned char>> buffer(4, vector<unsigned char>(4, 0x0));
     
     //Loop through every byte within the state
     for (int i = 0; i < 4; i++)
@@ -12,7 +13,7 @@ uint8_t ** invSubBytes(uint8_t **state)
         for (int j = 0; j < 4; j++)
         {
             //Find the correct substitution within the sbox
-            uint8_t current = state[i][j];
+            unsigned char current = state[i][j];
 
             int k = (current & 0xF0) >> 4;
             int l = (current & 0xF);
@@ -26,7 +27,7 @@ uint8_t ** invSubBytes(uint8_t **state)
 }
 
 // This transformation performs the inverse of shiftRows() on each row in the State
-void invShiftRows(uint8_t **state)
+void invShiftRows(vector<vector<unsigned char>>state)
 {
     //Loop through every row within the state
     for (int i = 0; i < 4; i++)
@@ -34,10 +35,10 @@ void invShiftRows(uint8_t **state)
         for (int j = 0; j < i; j++)
         {
             //Create buffer for each element in array
-            uint8_t temp1 = state[i][0];
-            uint8_t temp2 = state[i][1];
-            uint8_t temp3 = state[i][2];
-            uint8_t temp4 = state[i][3];
+            unsigned char temp1 = state[i][0];
+            unsigned char temp2 = state[i][1];
+            unsigned char temp3 = state[i][2];
+            unsigned char temp4 = state[i][3];
             //Rotate each element to the left
             state[i][0] = temp4;
             state[i][1] = temp1;
@@ -48,9 +49,9 @@ void invShiftRows(uint8_t **state)
 }
 
 // This transformation is the inverse of mixColumns
-void invMixColumns(uint8_t **state)
+void invMixColumns(vector<vector<unsigned char>>state)
 {
-    uint8_t state0, state1, state2, state3;
+    unsigned char state0, state1, state2, state3;
 
     //Loop through every column within the state
     for (int i = 0; i < 4; i++)
@@ -72,35 +73,38 @@ void invMixColumns(uint8_t **state)
     }
 }
 
-void invCipher(uint8_t ** cipher, string key, int Nk, int Nr)
+void invCipher(vector<vector<unsigned char>> cipher, string key, int Nk, int Nr)
 {
-    uint8_t **key_convert = stringTo2dArray(key);
-    uint32_t *w = KeyExpansion(key_convert, Nk, Nr);
+    vector<unsigned char> key_convert = stringTo1dArray(key);
 
-    cout << "round[ 0].iinput      " << arrayToString(cipher) << endl;
-    cout << "round[ 0].ik_sch       " << arrayToString(retrieveKey(w, 0)) << endl;
+    vector<unsigned int> w(44,0x0); //Nb * Nr +1
+
+    KeyExpansion(key_convert, w, Nk, Nr);
+
+    cout << "round[ 0].iinput      "; printState(cipher); cout << endl;
+    cout << "round[ 0].ik_sch      "; printState(cipher); cout << endl;
 
 
-    addRoundKey(cipher,0,w);
+    addRoundKey(cipher, w, 4);
 
-    for (int i = Nr-1; i > 0; i++)
+    for (int i = 1; i < Nr; i++)
     {
-        cout << "round[" << setw(2) << Nr-i << "].istart       " << arrayToString(cipher) << endl;
+        cout << "round[" << setw(2) << Nr-i << "].istart     "; printState(cipher); cout << endl;
         invShiftRows(cipher);
-        cout << "round[" << setw(2) << Nr-i << "].is_row       " << arrayToString(cipher) << endl;
+        cout << "round[" << setw(2) << Nr-i << "].is_row     "; printState(cipher); cout << endl;
         cipher = invSubBytes(cipher);
-        cout << "round[" << setw(2) << Nr-i << "].is_box       " << arrayToString(cipher) << endl;
-        addRoundKey(cipher, i, w);
-        cout << "round[" << setw(2) << Nr-i << "].ik_sch       " << arrayToString(retrieveKey(w, i)) << endl;
-        cout << "round[" << setw(2) << Nr-i << "].ik_add       " << arrayToString(cipher) << endl;
+        cout << "round[" << setw(2) << Nr-i << "].is_box     "; printState(cipher); cout << endl;
+        addRoundKey(cipher, w, 4);
+        cout << "round[" << setw(2) << Nr-i << "].ik_sch     "; printState(cipher); cout << endl;
+        cout << "round[" << setw(2) << Nr-i << "].ik_add     "; printState(cipher); cout << endl;
         invMixColumns(cipher);
     }
-    cout << "round[" << setw(2) << Nr << "].istart       " << arrayToString(cipher) << endl;
+    cout << "round[" << setw(2) << Nr << "].istart     "; printState(cipher); cout << endl;
     invShiftRows(cipher);
-    cout << "round[" << setw(2) << Nr << "].is_row       " << arrayToString(cipher) << endl;
+    cout << "round[" << setw(2) << Nr << "].is_row     "; printState(cipher); cout << endl;
     cipher = invSubBytes(cipher);
-    cout << "round[" << setw(2) << Nr << "].is_box       " << arrayToString(cipher) << endl;
-    cout << "round[" << setw(2) << Nr << "].ik_sch       " << arrayToString(retrieveKey(w, Nr)) << endl;
-    addRoundKey(cipher, Nr, w);
-    cout << "round[" << setw(2) << Nr << "].ioutput      " << arrayToString(retrieveKey(w, Nr)) << endl;
+    cout << "round[" << setw(2) << Nr << "].is_box     "; printState(cipher); cout << endl;
+    cout << "round[" << setw(2) << Nr << "].ik_sch     "; printState(cipher); cout << endl;
+    addRoundKey(cipher, w, 4);
+    cout << "round[" << setw(2) << Nr << "].ioutput    "; printState(cipher); cout << endl;
 }   

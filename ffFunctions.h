@@ -1,13 +1,13 @@
 #include <stdint.h>
 
 // adds two finite fields
-uint8_t ffadd(uint8_t field1, uint8_t field2)
+unsigned char ffadd(unsigned char field1, unsigned char field2)
 {
     return field1 ^ field2;
 }
 
 // multiplies a finite field by x
-uint8_t xtime(uint8_t field)
+unsigned char xtime(unsigned char field)
 {
     bool needXor = false;
     //Determine whether or not leading bit that is overflowed will be 1 or not
@@ -23,18 +23,20 @@ uint8_t xtime(uint8_t field)
     {
         field = field ^ 0x1b;
     }
+
+    return field;
 }
 
 // uses xtime to multiply any finite field by any other finite field
-uint8_t ffmultiply(uint8_t a, uint8_t b)
+unsigned char ffmultiply(unsigned char a, unsigned char b)
 {
-    uint32_t sum = 0x00;
+    unsigned char sum = 0x00;
 
     //Loop through bit a
     for (int i = 0; i < 8; i++)
     {
         //Find ai
-        uint8_t ai = (a >> i) & 0x01;
+        unsigned char ai = (a >> i) & 0x01;
 
         //If Ai is one xor
         if (ai == 0x01)
@@ -48,4 +50,6 @@ uint8_t ffmultiply(uint8_t a, uint8_t b)
             b = xtime(b);
         }
     }
+
+    return sum;
 }

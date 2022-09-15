@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
 
     cout << "CIPHER (ENCRYPT):"  << endl;
 
-    uint8_t **state = cipher(plaintext, key, Nk, Nr);
+    vector<vector<unsigned char>> state = cipher(plaintext, key, Nk, Nr); 
 
     cout << endl << "INVERSE CIPHER (DECRYPT):" << endl;
 

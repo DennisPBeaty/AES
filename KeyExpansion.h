@@ -1,9 +1,9 @@
 #include <stdint.h>
 
 // takes a four-byte input word and substitutes each byte in that word with its appropriate value from the S-Box
-uint32_t subWord(uint32_t word)
+unsigned int subWord(unsigned int word)
 {
-    vector<uint32_t> buffer;
+    vector<unsigned int> buffer;
 
     //Add individual bytes to buffer
     buffer.push_back((word & 0xFF000000) >> 24);
@@ -11,12 +11,12 @@ uint32_t subWord(uint32_t word)
     buffer.push_back((word & 0xFF00) >> 8);
     buffer.push_back(word & 0xFF);
 
-    uint32_t result = 0x0;
+    unsigned int result = 0x0;
     //Perform substitution of each byte with its corresponding location in Sbox
     for (int i = 0; i < buffer.size(); i++)
     {
-        uint32_t j = (buffer[i] & 0xF0) >> 4;
-		uint32_t k = buffer[i] & 0xF;
+        unsigned int j = (buffer[i] & 0xF0) >> 4;
+		unsigned int k = buffer[i] & 0xF;
 
         result = (result << 8) + sBox[j][k];
     }
@@ -25,24 +25,37 @@ uint32_t subWord(uint32_t word)
 }
 
 // performs a cyclic permutation on its input word
-uint32_t rotWord(uint32_t word)
+unsigned int rotWord(unsigned int word)
 {
-    uint32_t result = (word << 8) & 0xFFFFFFFF;
+    unsigned int result = (word << 8) & 0xFFFFFFFF;
 
     return (result | ((word >> 24) & 0xFF));
 }
 
 //Routine used to generate a series of Round Keys from the Cipher Key. 
-uint32_t * KeyExpansion(uint8_t *key, int Nk, int Nr)
+void KeyExpansion(vector<unsigned char>key, vector<unsigned int>w, int Nk, int Nr)
 {
-    uint32_t temp;
-    uint32_t *w;
+    unsigned int temp;
+    int i = 0; 
 
-    int i = 0;
-    
-    for (i = 0; i < Nk; i++)
-    {
-        w[i] = (uint32_t(key[4*i]) << 24) | (uint32_t(key[4*i+1]) << 16) | (uint32_t(key[4*i+2]) << 8) | uint32_t(key[4*i+3]);
+    int temp_word = 0x0;
+
+    while (i < Nk) {
+        temp_word = temp_word | key[4*i];
+        temp_word = temp_word << 8;
+
+        temp_word = temp_word | key[4*i + 1];
+        temp_word = temp_word << 8;
+
+        temp_word = temp_word | key[4*i + 2];
+        temp_word = temp_word << 8;
+
+        temp_word = temp_word | key[4*i + 3];   
+
+        w[i] = temp_word;
+
+        temp_word = 0x0;
+        i++;
     }
 
     i = Nk;
@@ -60,5 +73,4 @@ uint32_t * KeyExpansion(uint8_t *key, int Nk, int Nr)
         }
         w[i] = w[i - Nk] ^ temp;
     }
-    return w;
 }

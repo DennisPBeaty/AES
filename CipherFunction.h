@@ -1,10 +1,12 @@
 #include <stdint.h>
 #include <iomanip>
+#include "Conversions.h"
 
 // This transformation substitutes each byte in the State with its corresponding value from the S-Box.
-uint8_t ** subBytes(uint8_t **state)
+vector<vector<unsigned char>> subBytes(vector<vector<unsigned char>>state)
 {
-    uint8_t **buffer;
+    vector<vector<unsigned char>> buffer(4, vector<unsigned char>(4, 0x0));
+
     
     //Loop through every byte within the state
     for (int i = 0; i < 4; i++)
@@ -12,7 +14,7 @@ uint8_t ** subBytes(uint8_t **state)
         for (int j = 0; j < 4; j++)
         {
             //Find the correct substitution within the sbox
-            uint8_t current = state[i][j];
+            unsigned char current = state[i][j];
 
             int k = (current & 0xF0) >> 4;
             int l = (current & 0xF);
@@ -26,7 +28,7 @@ uint8_t ** subBytes(uint8_t **state)
 }
 
 // This transformation performs a circular shift on each row in the State (see Section 5.1.2)
-void shiftRows(uint8_t **state)
+void shiftRows(vector<vector<unsigned char>>state)
 {
     //Loop through every row within the state
     for (int i = 0; i < 4; i++)
@@ -34,10 +36,10 @@ void shiftRows(uint8_t **state)
         for (int j = 0; j < i; j++)
         {
             //Create buffer for each element in array
-            uint8_t temp1 = state[i][0];
-            uint8_t temp2 = state[i][1];
-            uint8_t temp3 = state[i][2];
-            uint8_t temp4 = state[i][3];
+            unsigned char temp1 = state[i][0];
+            unsigned char temp2 = state[i][1];
+            unsigned char temp3 = state[i][2];
+            unsigned char temp4 = state[i][3];
             //Rotate each element to the left
             state[i][0] = temp2;
             state[i][1] = temp3;
@@ -49,9 +51,9 @@ void shiftRows(uint8_t **state)
 
 // This transformation treats each column in state as a four-term polynomial. This polynomial is multiplied 
 // (modulo another polynomial) by a fixed polynomial with coefficients (see Sections 4.3 and 5.1.3).
-void mixColumns(uint8_t **state)
+void mixColumns(vector<vector<unsigned char>> state)
 {
-    uint8_t state0, state1, state2, state3;
+    unsigned char state0, state1, state2, state3;
 
     //Loop through every column within the state
     for (int i = 0; i < 4; i++)
@@ -73,68 +75,55 @@ void mixColumns(uint8_t **state)
     }
 }
 
-uint8_t ** retrieveKey(uint32_t *w, int round)
-{
-    uint8_t **key;
-
-    //Find the key
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            key[i][j] = (w[round*4+j] >> ((3-i)*8)) & 0xFF;
-        }
-    }
-}
-
 // This transformation adds a round key to the State using XOR.
-void addRoundKey(uint8_t **state, int round, uint32_t *w)
+void addRoundKey(vector<vector<unsigned char>> state, vector<unsigned int> w, int Nb)
 {
-    uint8_t **buffer;
-    uint8_t **key;
-
-    //Find the key
-    retrieveKey(w, round);
-
-    //Xor with key/Add
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < Nb; i++)
     {
-        for (int j = 0; j < 4; j++)
-        {
-            state[i][j] = ffadd(key[i][j], state[i][j]);
-        }
+        state[0][i] = state[0][i] ^ (w[i] >> 24);
+        state[1][i] = state[1][i] ^ (w[i] >> 16);
+        state[2][i] = state[2][i] ^ (w[i] >> 8);
+        state[3][i] = state[3][i] ^ (w[i]);
     }
 }
 
-uint8_t ** cipher(string plain, string key, int Nk, int Nr)
+vector<vector<unsigned char>> cipher(string plain, string key, int Nk, int Nr)
 {
-    uint8_t **state = stringTo2dArray(plain);
-    uint8_t **key_convert = stringTo2dArray(key);
-    uint32_t *w = KeyExpansion(key_convert, Nk, Nr);
+    vector<vector<unsigned char>> state = stringTo2dArray(plain);
+    const int length = key.length();
+    vector<unsigned char> key_convert = stringTo1dArray(key);
+
+    vector<unsigned int> w(44,0x0); //Nb * Nr +1
+
+    KeyExpansion(key_convert, w, Nk, Nr);
 
     cout << "round[ 0].input      " << plain << endl; 
 
-    addRoundKey(state, 0, w);
+    addRoundKey(state, w, 4);
 
     for (int i = 1; i < Nr; i++)
     {
-        cout << "round[" << setw(2) << i << "].k_sch       " << arrayToString(retrieveKey(w, i)) << endl;
-        cout << "round[" << setw(2) << i << "].start       " << arrayToString(state) << endl;
+        cout << "round[" << setw(2) << i << "].k_sch      "; printState(state); cout << endl;
+        cout << "round[" << setw(2) << i << "].start      "; printState(state); cout <<  endl;
+
         state = subBytes(state);
-        cout << "round[" << setw(2) << i << "].s_box       " << arrayToString(state) << endl;
+
+        cout << "round[" << setw(2) << i << "].s_box      "; printState(state); cout << endl;
+
         shiftRows(state);
-        cout << "round[" << setw(2) << i << "].s_row       " << arrayToString(state) << endl;
+
+        cout << "round[" << setw(2) << i << "].s_row      "; printState(state); cout << endl;
         mixColumns(state);
-        cout << "round[" << setw(2) << i << "].m_col       " << arrayToString(state) << endl;
+        cout << "round[" << setw(2) << i << "].m_col      "; printState(state); cout << endl;
     }
 
     state = subBytes(state);
-    cout << "round[" << setw(2) << Nr << "].s_box       " << arrayToString(state) << endl;
+    cout << "round[" << setw(2) << Nr << "].s_box      "; printState(state); cout << endl;
     shiftRows(state);
-    cout << "round[" << setw(2) << Nr << "].s_row       " << arrayToString(state) << endl;
-    addRoundKey(state, Nr, w);
-    cout << "round[" << setw(2) << Nr << "].k_sch       " << arrayToString(retrieveKey(w, Nr)) << endl;
-    cout << "round[" << setw(2) << Nr << "].output      " << arrayToString(state) << endl;
+    cout << "round[" << setw(2) << Nr << "].s_row      "; printState(state); cout << endl;
+    addRoundKey(state, w, 4);
+    cout << "round[" << setw(2) << Nr << "].k_sch      "; printState(state); cout << endl;
+    cout << "round[" << setw(2) << Nr << "].output     "; printState(state); cout << endl;
 
     return state;
 }
