@@ -75,6 +75,22 @@ void mixColumns(vector<vector<unsigned char>> state)
     }
 }
 
+vector<vector<unsigned char>> retrieveKey(vector<unsigned int> w, int round)
+{
+    vector<vector<unsigned char>> key(4, vector<unsigned char>(4, 0x0));
+
+    //Find the key
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {       
+            key[i][j] = (w[round*4+j] >> ((3-i)*8)) & 0xFF;
+        }
+    }
+
+    return key;
+}
+
 // This transformation adds a round key to the State using XOR.
 void addRoundKey(vector<vector<unsigned char>> state, vector<unsigned int> w, int Nb)
 {
