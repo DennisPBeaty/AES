@@ -8,14 +8,26 @@
 
 using namespace std;
 
-vector<vector<unsigned char>> stringTo2dArray(string hex)
-{
-    vector<unsigned char> bytes;
+vector<unsigned char> stringTo1dVector(string text) {
+    vector<unsigned char> result;
 
-    for (unsigned int i = 0; i < hex.length(); i += 2) {
-        string byteString = hex.substr(i, 2);
-        unsigned char byte = (unsigned char) strtol(byteString.c_str(), NULL, 16);
-        bytes.push_back(byte);
+    for (unsigned int i = 0; i < text.length(); i += 2) {
+        string result1 = text.substr(i, 2);
+        unsigned char byte = (unsigned char) strtol(result1.c_str(), NULL, 16);
+        result.push_back(byte);
+    }
+
+    return result;
+}
+
+vector<vector<unsigned char>> stringTo2dVector(string text)
+{
+    vector<unsigned char> result;
+
+    for (unsigned int i = 0; i < text.length(); i += 2) {
+        string result1 = text.substr(i, 2);
+        unsigned char byte = (unsigned char) strtol(result1.c_str(), NULL, 16);
+        result.push_back(byte);
     }
 
     vector<vector<unsigned char>> state(4, vector<unsigned char>(4, 0x0));
@@ -25,27 +37,12 @@ vector<vector<unsigned char>> stringTo2dArray(string hex)
     {
         for (int j = 0; j < 4; j++)
         {
-            state[i][j] = bytes[x];
+            state[i][j] = result[x];
                 x++;
         }
     }
 
     return state;
-}
-
-char chars[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-
-//NEEDS CHANGE NEEDS CHANGE NEEDS CHANGE
-vector<unsigned char> stringTo1dArray(string hex) {
-    vector<unsigned char> bytes;
-
-    for (unsigned int i = 0; i < hex.length(); i += 2) {
-        string byteString = hex.substr(i, 2);
-        unsigned char byte = (unsigned char) strtol(byteString.c_str(), NULL, 16);
-        bytes.push_back(byte);
-    }
-
-    return bytes;
 }
 
 void printState(vector<vector<unsigned char>> & state)

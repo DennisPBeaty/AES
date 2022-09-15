@@ -35,42 +35,40 @@ unsigned int rotWord(unsigned int word)
 //Routine used to generate a series of Round Keys from the Cipher Key. 
 void KeyExpansion(vector<unsigned char>key, vector<unsigned int>w, int Nk, int Nr)
 {
-    unsigned int temp;
+    int buff_word = 0x0;
+    unsigned int buff;
     int i = 0; 
 
-    int temp_word = 0x0;
-
-    while (i < Nk) {
-        temp_word = temp_word | key[4*i];
-        temp_word = temp_word << 8;
-
-        temp_word = temp_word | key[4*i + 1];
-        temp_word = temp_word << 8;
-
-        temp_word = temp_word | key[4*i + 2];
-        temp_word = temp_word << 8;
-
-        temp_word = temp_word | key[4*i + 3];   
-
-        w[i] = temp_word;
-
-        temp_word = 0x0;
-        i++;
+    for (i = 0; i < Nk; i++) {
+        buff_word = 0x0;
+        //First 8 bit
+        buff_word = buff_word | key[4*i];
+        buff_word = buff_word << 8;
+        //Second 8 bit
+        buff_word = buff_word | key[4*i + 1];
+        buff_word = buff_word << 8;
+        //Third 8 bit
+        buff_word = buff_word | key[4*i + 2];
+        buff_word = buff_word << 8;
+        //Fourth 8 bit
+        buff_word = buff_word | key[4*i + 3];   
+        //Set val
+        w[i] = buff_word;
     }
 
     i = Nk;
 
     for (i = 0; i < (4*(Nr+1)); i++)
     {
-        temp = w[i-1];
+        buff = w[i-1];
         if (i % Nk == 0)
         {
-            temp = subWord(rotWord(temp)) ^ Rcon[i/Nk];
+            buff = subWord(rotWord(buff)) ^ Rcon[i/Nk];
         }
         else if ((Nk > 6) && (i % Nk == 4))
         {
-            temp = subWord(temp);
+            buff = subWord(buff);
         }
-        w[i] = w[i - Nk] ^ temp;
+        w[i] = w[i-Nk] ^ buff;
     }
 }

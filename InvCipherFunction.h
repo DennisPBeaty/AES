@@ -75,36 +75,42 @@ void invMixColumns(vector<vector<unsigned char>>state)
 
 void invCipher(vector<vector<unsigned char>> cipher, string key, int Nk, int Nr)
 {
-    vector<unsigned char> key_convert = stringTo1dArray(key);
+    vector<unsigned char> key_convert = stringTo1dVector(key);
 
     vector<unsigned int> w(44,0x0); //Nb * Nr +1
 
     KeyExpansion(key_convert, w, Nk, Nr);
 
-    cout << "round[ 0].iinput      "; printState(cipher); cout << endl;
-    cout << "round[ 0].ik_sch      "; printState(cipher); cout << endl;
+    cout << "round[ 0].iinput    "; printState(cipher); cout << endl;
+    cout << "round[ 0].ik_sch    "; printState(cipher); cout << endl;
 
 
     addRoundKey(cipher, w, 4);
 
     for (int i = 1; i < Nr; i++)
     {
-        cout << "round[" << setw(2) << Nr-i << "].istart     "; printState(cipher); cout << endl;
+        cout << "round[" << setw(2) << Nr-i << "].istart    "; printState(cipher); cout << endl;
         invShiftRows(cipher);
-        cout << "round[" << setw(2) << Nr-i << "].is_row     "; printState(cipher); cout << endl;
+        cout << "round[" << setw(2) << Nr-i << "].is_row    "; printState(cipher); cout << endl;
         cipher = invSubBytes(cipher);
-        cout << "round[" << setw(2) << Nr-i << "].is_box     "; printState(cipher); cout << endl;
+        cout << "round[" << setw(2) << Nr-i << "].is_box    "; printState(cipher); cout << endl;
         addRoundKey(cipher, w, 4);
-        cout << "round[" << setw(2) << Nr-i << "].ik_sch     "; printState(retrieveKey(w, i)); cout << endl;
-        cout << "round[" << setw(2) << Nr-i << "].ik_add     "; printState(cipher); cout << endl;
+        vector<vector<unsigned char>> buffer(4, vector<unsigned char>(4, 0x0));
+
+        buffer = retrieveKey(w, i);
+        cout << "round[" << setw(2) << Nr-i << "].ik_sch    "; printState(buffer); cout << endl;
+        cout << "round[" << setw(2) << Nr-i << "].ik_add    "; printState(cipher); cout << endl;
         invMixColumns(cipher);
     }
-    cout << "round[" << setw(2) << Nr << "].istart     "; printState(cipher); cout << endl;
+    cout << "round[" << setw(2) << Nr << "].istart    "; printState(cipher); cout << endl;
     invShiftRows(cipher);
-    cout << "round[" << setw(2) << Nr << "].is_row     "; printState(cipher); cout << endl;
+    cout << "round[" << setw(2) << Nr << "].is_row    "; printState(cipher); cout << endl;
     cipher = invSubBytes(cipher);
-    cout << "round[" << setw(2) << Nr << "].is_box     "; printState(cipher); cout << endl;
-    cout << "round[" << setw(2) << Nr << "].ik_sch     "; printState(retrieveKey(w, Nr)); cout << endl;
+    cout << "round[" << setw(2) << Nr << "].is_box    "; printState(cipher); cout << endl;
+    vector<vector<unsigned char>> buffer(4, vector<unsigned char>(4, 0x0));
+
+    buffer = retrieveKey(w, Nr);
+    cout << "round[" << setw(2) << Nr << "].ik_sch    "; printState(buffer); cout << endl;
     addRoundKey(cipher, w, 4);
-    cout << "round[" << setw(2) << Nr << "].ioutput    "; printState(cipher); cout << endl;
+    cout << "round[" << setw(2) << Nr << "].ioutput   "; printState(cipher); cout << endl;
 }   

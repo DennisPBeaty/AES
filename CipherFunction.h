@@ -105,41 +105,47 @@ void addRoundKey(vector<vector<unsigned char>> state, vector<unsigned int> w, in
 
 vector<vector<unsigned char>> cipher(string plain, string key, int Nk, int Nr)
 {
-    vector<vector<unsigned char>> state = stringTo2dArray(plain);
+    vector<vector<unsigned char>> state = stringTo2dVector(plain);
     const int length = key.length();
-    vector<unsigned char> key_convert = stringTo1dArray(key);
+    vector<unsigned char> key_convert = stringTo1dVector(key);
 
     vector<unsigned int> w(44,0x0); //Nb * Nr +1
 
     KeyExpansion(key_convert, w, Nk, Nr);
 
-    cout << "round[ 0].input      " << plain << endl; 
+    cout << "round[ 0].input     " << plain << endl; 
 
     addRoundKey(state, w, 4);
 
     for (int i = 1; i < Nr; i++)
     {
-        cout << "round[" << setw(2) << i << "].k_sch      "; printState(retrieveKey(w, i)); cout << endl;
-        cout << "round[" << setw(2) << i << "].start      "; printState(state); cout <<  endl;
+        vector<vector<unsigned char>> buffer(4, vector<unsigned char>(4, 0x0));
+
+        buffer = retrieveKey(w, i);
+        cout << "round[" << setw(2) << i << "].k_sch     "; printState(buffer); cout << endl;
+        cout << "round[" << setw(2) << i << "].start     "; printState(state); cout <<  endl;
 
         state = subBytes(state);
 
-        cout << "round[" << setw(2) << i << "].s_box      "; printState(state); cout << endl;
+        cout << "round[" << setw(2) << i << "].s_box     "; printState(state); cout << endl;
 
         shiftRows(state);
 
-        cout << "round[" << setw(2) << i << "].s_row      "; printState(state); cout << endl;
+        cout << "round[" << setw(2) << i << "].s_row     "; printState(state); cout << endl;
         mixColumns(state);
-        cout << "round[" << setw(2) << i << "].m_col      "; printState(state); cout << endl;
+        cout << "round[" << setw(2) << i << "].m_col     "; printState(state); cout << endl;
     }
 
     state = subBytes(state);
-    cout << "round[" << setw(2) << Nr << "].s_box      "; printState(state); cout << endl;
+    cout << "round[" << setw(2) << Nr << "].s_box     "; printState(state); cout << endl;
     shiftRows(state);
-    cout << "round[" << setw(2) << Nr << "].s_row      "; printState(state); cout << endl;
+    cout << "round[" << setw(2) << Nr << "].s_row     "; printState(state); cout << endl;
     addRoundKey(state, w, 4);
-    cout << "round[" << setw(2) << Nr << "].k_sch      "; printState(retrieveKey(w, Nr)); cout << endl;
-    cout << "round[" << setw(2) << Nr << "].output     "; printState(state); cout << endl;
+    vector<vector<unsigned char>> buffer(4, vector<unsigned char>(4, 0x0));
+
+    buffer = retrieveKey(w, Nr);
+    cout << "round[" << setw(2) << Nr << "].k_sch     "; printState(buffer); cout << endl;
+    cout << "round[" << setw(2) << Nr << "].output    "; printState(state); cout << endl;
 
     return state;
 }
