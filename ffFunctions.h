@@ -1,5 +1,3 @@
-#include <stdint.h>
-
 // adds two finite fields
 unsigned char ffadd(unsigned char field1, unsigned char field2)
 {

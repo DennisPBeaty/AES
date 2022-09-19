@@ -1,5 +1,3 @@
-#include <stdint.h>
-
 // takes a four-byte input word and substitutes each byte in that word with its appropriate value from the S-Box
 unsigned int subWord(unsigned int word)
 {
@@ -27,40 +25,22 @@ unsigned int subWord(unsigned int word)
 // performs a cyclic permutation on its input word
 unsigned int rotWord(unsigned int word)
 {
-    unsigned int result = (word << 8) & 0xFFFFFFFF;
-
-    return (result | ((word >> 24) & 0xFF));
+    return ((word << 8) | ((word >> 24)));
 }
 
 //Routine used to generate a series of Round Keys from the Cipher Key. 
-void KeyExpansion(vector<unsigned char>key, vector<unsigned int>w, int Nk, int Nr)
+void KeyExpansion(vector<unsigned char>key, vector<unsigned int>& w, int Nk, int Nr)
 {
     int buff_word = 0x0;
-    unsigned int buff;
     int i = 0; 
 
     for (i = 0; i < Nk; i++) {
-        buff_word = 0x0;
-        //First 8 bit
-        buff_word = buff_word | key[4*i];
-        buff_word = buff_word << 8;
-        //Second 8 bit
-        buff_word = buff_word | key[4*i + 1];
-        buff_word = buff_word << 8;
-        //Third 8 bit
-        buff_word = buff_word | key[4*i + 2];
-        buff_word = buff_word << 8;
-        //Fourth 8 bit
-        buff_word = buff_word | key[4*i + 3];   
-        //Set val
-        w[i] = buff_word;
+        w[i] = ((key[4*i]) << 24) | ((key[4*i+1]) << 16) | ((key[4*i+2]) << 8) | (key[4*i+3]);
     }
 
-    i = Nk;
-
-    for (i = 0; i < (4*(Nr+1)); i++)
+    for (i = Nk; i < (4*(Nr+1)); i++)
     {
-        buff = w[i-1];
+        unsigned int buff = w[i-1];
         if (i % Nk == 0)
         {
             buff = subWord(rotWord(buff)) ^ Rcon[i/Nk];
